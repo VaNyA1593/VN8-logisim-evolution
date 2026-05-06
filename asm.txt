@@ -1,0 +1,19 @@
+cal hello1
+ldi r6 24
+hlt
+
+hello1:
+    ldi r1 4
+    cal hello2
+    ldi r5 20
+    ret
+
+hello2:
+    ldi r2 8
+    cal hello3
+    ldi r4 16
+    ret
+
+hello3:
+    ldi r3 12
+    ret
