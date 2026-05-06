@@ -15,7 +15,7 @@ How to use:
   5. Right click the ROM (Next to the clock) and click edit, then paste in your HEX codes(make sure to clear the ROM in case there is some previous code)
 
 How to use assembler:
-  1. Download python
+  1. Download main.py, hex.txt and asm.txt (bin.txt is optional and used for debug mostly)
   2. Type the assembly code into asm.txt
   3. run the python file
   4. Go into hex.txt, press ctrl+A and ctrl+C, then use ctrl+V to paste it into the ROM.
