@@ -13,6 +13,7 @@ How to use:
   3. Open the project in logisim evolution
   4. Press ctrl + 1 to select the interact tool
   5. Right click the ROM (Next to the clock) and click edit, then paste in your HEX codes(make sure to clear the ROM in case there is some previous code)
+  6. Press ctrl + K to toggle the clock ticks, then click the "Run" button to run the program.
 
 How to use assembler:
   1. Download main.py, hex.txt and asm.txt (bin.txt is optional and used for debug mostly)
@@ -34,6 +35,7 @@ mul rA rB rC = rA * rB -> rC
 log rA rB rC op = rA op rB -> rC
 jmp value = value -> counter
 brh value con = if con: value -> counter
+ldi rA value = value -> rA
 lod rA rB = ram[rA] -> rB
 str rA rB = rB -> ram[rA]
 exr rA port = input-ports[port] -> ram[rA]
