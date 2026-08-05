@@ -129,22 +129,6 @@ for line in lines:
         bin_inst = f"1000{r1}{r2}000000"
         program.append(to_hex(bin_inst) + "\n")
 
-    # ---- EXR ----
-    elif opcode == "exr":
-        r1 = register_to_bin(parts[1])
-        port = format(int(parts[2]), "02b")
-
-        bin_inst = f"1001{r1}00000{port}00"
-        program.append(to_hex(bin_inst) + "\n")
-
-    # ---- EXW ----
-    elif opcode == "exw":
-        r1 = register_to_bin(parts[1])
-        port = format(int(parts[2]), "02b")
-
-        bin_inst = f"1010{r1}00000{port}00"
-        program.append(to_hex(bin_inst) + "\n")
-
     # ---- CALL ----
     elif opcode == "cal":
         addr = format(labels[parts[1]], "08b")
