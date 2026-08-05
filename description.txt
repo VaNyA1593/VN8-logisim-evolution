@@ -5,7 +5,15 @@ The VN-8 is an 8 bit processor made in logisim evolution. The specs:
   256 instructions(16x256 ROM)
   Call stack
   Alu operations: ADD, SUB, MUL, LOG: and or nor xor rightshift
-  4x input and output ports
+  8x memory mapped input and output ports (addresses 248-255)
+  A 256x256 screen which is wired like so:
+    X value is address 248
+    Y value is address 249
+    Address 250 is: 
+      bit 0: Clear screen
+      bit 1: Screen clock
+      bit 2: Write enable
+      bit 3: Color: white if 0, black if 1
 
 How to use:
   1. Download logisim evolution: https://github.com/logisim-evolution/logisim-evolution/releases
@@ -39,8 +47,6 @@ brh value con = if con: value -> counter
 ldi rA value = value -> rA
 lod rA rB = ram[rA] -> rB
 str rA rB = rB -> ram[rA]
-exr rA port = input-ports[port] -> ram[rA]
-exw rA port = ram[rA] -> output-ports[port]
 cal value = counter + 1 -> stack, value -> counter
 ret = stack -> counter
 hlt = stops the clock
