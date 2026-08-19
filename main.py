@@ -19,6 +19,9 @@ inst_counter = 0
 for line in lines:
     parts = line.split()
 
+    if parts[0].startswith(";"):
+        continue
+
     if parts[0].endswith(":"):
         label = parts[0][:-1]
         labels[label] = inst_counter
