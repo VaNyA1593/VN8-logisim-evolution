@@ -10,9 +10,9 @@ The VN-8 is an 8 bit processor made in logisim evolution. The specs:
     X value is address 248
     Y value is address 249
     Address 250 is: 
-      bit 0: Clear screen
+      bit 0: Write enable
       bit 1: Screen clock
-      bit 2: Write enable
+      bit 2: Clear screen
       bit 3: Color: white if 0, black if 1
 
 How to use:
@@ -51,6 +51,8 @@ cal value = counter + 1 -> stack, value -> counter
 ret = stack -> counter
 hlt = stops the clock
 
+comments start with ; and can be written in the start of a line or after an instruction
+
 labels are basically pointers in the code you can reference in jmp, brh and cal
 
 written like this:
@@ -60,4 +62,4 @@ label:
 
 jmp label
 
-Note that there is still some bugs especially with the call stack when using complex code however it still works.
+Note that there is still some bugs especially with the call stack when using complex code however it still works with most programs.
