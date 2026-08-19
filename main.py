@@ -38,6 +38,9 @@ for line in lines:
     if opcode.endswith(":"):
         continue
 
+    if opcode.startswith(";"):
+        continue
+
     # ---- NOP ----
     if opcode == "nop":
         program.append("0000\n")
