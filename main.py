@@ -113,7 +113,8 @@ for line in lines:
         cond_bits = {
             "z": "0000",
             "n": "0100",
-            "c": "1000"
+            "c": "1000",
+            "nz": "1100"
         }[cond]
 
         bin_inst = f"0110{addr}{cond_bits}"
