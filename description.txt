@@ -31,11 +31,10 @@ How to use assembler:
   4. Go into hex.txt, press ctrl+A and ctrl+C, then use ctrl+V to paste it into the ROM.
 
 Instruction set:
-value = 8 bit value
-rA/rB/rC = select register(3 bit, r0 to r7, r0 is constant zero)
-con = there are 3 flags that are set after any alu operation: zero(z), carryout(c) and negative(n) !! The assembler only takes the single letter options: z, n or c
-op = logic operations: and or nor xor rsh
-port = 2 bit value: 0-3
+value: 8 bit value
+rA/rB/rC: select register(3 bit, r0 to r7, r0 is constant zero)
+con: there are 4 flags that are set after any alu operation: zero(z), carryout(c), negative(n) and not zero (nz) !! The assembler only takes the single letter options: z, n, c or nz
+op: logic operations: and or nor xor rsh
 
 nop = does nothing
 add rA rB rC = rA + rB -> rC
