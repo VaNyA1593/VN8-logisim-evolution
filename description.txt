@@ -1,5 +1,5 @@
 The VN-8 is an 8 bit processor made in logisim evolution. The specs:
-  7 general purpose register (r1-r7) 
+  7 general purpose registers (r1-r7) 
   r0 is always 0 and writes are discarded(good way to only set flags in an ALU operation for example: sub r1 r2 r0)
   256 bytes RAM
   256 instructions(16x256 ROM)
@@ -21,8 +21,9 @@ How to use:
   3. Open the project in logisim evolution
   4. Press ctrl + 1 to select the interact tool
   5. Right click the ROM (Next to the clock) and click edit, then paste in your HEX codes(make sure to clear the ROM by right clicking and clicking "clear" in case there is some previous code.)
-  6. Press ctrl + K to toggle the clock ticks, then click the "Run" button to run the program.
-  7. If you want to run another program, clear the ROM and click the "reset button"
+  6. Press ctrl + K to toggle the clock ticks, then click the "Run" button to run the program. 
+    6.1. If you want to edit the clock speed, find the simulate tab at the top of the window and choose the frequency you want in the auto tick tab.
+  7. If you want to run another program, clear the ROM and click the "reset" button
 
 How to use assembler:
   1. Download main.py, hex.txt and asm.txt (bin.txt is optional and used for debug mostly)
