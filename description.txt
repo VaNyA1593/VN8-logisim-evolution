@@ -1,29 +1,35 @@
 The VN-8 is an 8 bit processor made in logisim evolution. The specs:
   7 general purpose registers (r1-r7) 
   r0 is always 0 and writes are discarded(good way to only set flags in an ALU operation for example: sub r1 r2 r0)
-  256 bytes RAM
-  256 instructions(16x256 ROM)
-  Call stack
-  Alu operations: ADD, SUB, MUL, LOG: and or nor xor rightshift
-  8x memory mapped input and output ports (addresses 248-255)
-  A 256x256 screen which is wired like so:
-    X value is address 248
-    Y value is address 249
-    Address 250 is: 
-      bit 0: Write enable
-      bit 1: Screen clock
-      bit 2: Clear screen
-      bit 3: Color: white if 0, black if 1
+  64k bytes RAM
+  64k instructions(16x65536 ROM)
+  16 deep call stack
+  Alu operations: ADD, SUB, MUL, LOG: and, or, nor, xor, rightshift
+  8x memory mapped input and output ports (addresses 0x00f8-0x00ff)
+  Storing to an I/O address stores to the output but reading from that same address reads the input
+  A 128x128 screen which is wired like so:
+    X value is address 0x00f8
+    Y value is address 0x00f9
+    Color value is address 0xfa, its in 3-3-2 format and updates the screen when stored to.
+  And a controller mapped to 0x00f8 where bits 0-7 are:
+    Bit 0 - Y
+    Bit 1 - B
+    Bit 2 - A
+    Bit 3 - X
+    Bit 4 - Dpad up
+    Bit 5 - Dpad right
+    Bit 6 - Dpad down
+    Bit 7 - Dpad left
 
 How to use:
   1. Download logisim evolution: https://github.com/logisim-evolution/logisim-evolution/releases
-  2. Download the project itself
+  2. Download the project itself (vn8.circ)
   3. Open the project in logisim evolution
   4. Press ctrl + 1 to select the interact tool
-  5. Right click the ROM (Next to the clock) and click edit, then paste in your HEX codes(make sure to clear the ROM by right clicking and clicking "clear" in case there is some previous code.)
-  6. Press ctrl + K to toggle the clock ticks, then click the "Run" button to run the program. 
+  5. Right click the ROM (to the left of the I/O) and click edit, then paste in your HEX codes(make sure to clear the ROM by right clicking and clicking "clear" in case there is some previous code.)
+  6. Press ctrl + K to toggle the clock ticks, then click the "Run" button to run the program or single step it yourself (4 ticks per instruction). 
     6.1. If you want to edit the clock speed, find the simulate tab at the top of the window and choose the frequency you want in the auto tick tab.
-  7. If you want to run another program, clear the ROM and click the "reset" button
+  7. If you want to run another program, clear the ROM and click the "reset" button before pasting in the new program
 
 How to use assembler:
   1. Download main.py, hex.txt and asm.txt (bin.txt is optional and used for debug mostly)
@@ -34,7 +40,7 @@ How to use assembler:
 Instruction set:
 value: 8 bit value
 rA/rB/rC: select register(3 bit, r0 to r7, r0 is constant zero)
-con: there are 4 flags that are set after any alu operation: zero(z), carryout(c), negative(n) and not zero (nz) !! The assembler only takes the single letter options: z, n, c or nz
+con: there are 4 flags that are set after any alu operation: zero(z), carryout(c), negative(n) and not zero (nz) !! The assembler only takes the following options: z, n, c or nz
 op: logic operations: and or nor xor rsh
 
 nop = does nothing
@@ -45,21 +51,27 @@ log rA rB rC op = rA op rB -> rC
 jmp value = value -> counter
 brh value con = if con: value -> counter
 ldi rA value = value -> rA
+adi rA value = rA + value -> rA
 lod rA rB = ram[rA] -> rB
 str rA rB = rB -> ram[rA]
 cal value = counter + 1 -> stack, value -> counter
 ret = stack -> counter
 hlt = stops the clock
 
-comments start with ; and can be written in the start of a line or after an instruction
+In the assembler, there is also pseudoinstructions:
+mov rA rB = copy rA into rB
+cmp rA rB = rA-rB but the result is discarded
 
-labels are basically pointers in the code you can reference in jmp, brh and cal
+Comments start with ; and can be written in the start of a line or after an instruction
 
-written like this:
+Labels are basically pointers in the code you can reference in jmp, brh and cal to avoid address confusion.
+Defined like this:
 
 label:
-  something
+  ...
+
+And referenced like this:
 
 jmp label
-
-Note that there is still some bugs especially with the call stack when using complex code however it still works with most programs.
+cal label
+brh label con
