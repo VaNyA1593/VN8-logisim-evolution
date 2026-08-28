@@ -27,6 +27,9 @@ for line in lines:
         labels[label] = inst_counter
         continue
 
+    if parts[0] == "jmp" or parts[0] == "brh" or parts[0] == "cal":
+        inst_counter += 1
+
     inst_counter += 1
 
 
@@ -101,13 +104,15 @@ for line in lines:
 
     # ---- JMP ----
     elif opcode == "jmp":
-        addr = format(labels[parts[1]], "08b")
-        bin_inst = f"0101{addr}0000"
+        addr = format(labels[parts[1]], "16b")
+        bin_inst = f"0101000000000000"
+        program.append(to_hex(bin_inst) + "\n")
+        bin_inst = f"{addr}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- BRH ----
     elif opcode == "brh":
-        addr = format(labels[parts[1]], "08b")
+        addr = format(labels[parts[1]], "16b")
         cond = parts[2]
 
         cond_bits = {
@@ -117,29 +122,35 @@ for line in lines:
             "nz": "1100"
         }[cond]
 
-        bin_inst = f"0110{addr}{cond_bits}"
+        bin_inst = f"011000000000{cond_bits}"
+        program.append(to_hex(bin_inst) + "\n")
+        bin_inst = f"{addr}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- LOD ----
     elif opcode == "lod":
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
+        r3 = register_to_bin(parts[3])
 
-        bin_inst = f"0111{r1}000000{r2}"
+        bin_inst = f"0111{r2}{r1}000{r3}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- STR ----
     elif opcode == "str":
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
+        r3 = register_to_bin(parts[3])
 
-        bin_inst = f"1000{r1}{r2}000000"
+        bin_inst = f"1000{r2}{r1}000{r3}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- CALL ----
     elif opcode == "cal":
-        addr = format(labels[parts[1]], "08b")
-        bin_inst = f"1100{addr}0000"
+        addr = format(labels[parts[1]], "16b")
+        bin_inst = f"1100000000000000"
+        program.append(to_hex(bin_inst) + "\n")
+        bin_inst = f"{addr}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- RET ----
@@ -150,6 +161,28 @@ for line in lines:
     elif opcode == "hlt":
         program.append("b000\n")
 
+    # ---- ADI ----
+    elif opcode == "adi":
+        r1 = register_to_bin(parts[1])
+        imm = format(int(parts[2], 0), "08b")
+
+        bin_inst = f"1001{r1}0{imm}"
+        program.append(to_hex(bin_inst) + "\n")
+
+    elif opcode == "mov":
+        r1 = register_to_bin(parts[1])
+        r2 = register_to_bin(parts[2])
+
+        bin_inst = f"0001{r1}000000{r2}"
+        program.append(to_hex(bin_inst) + "\n")        
+
+    elif opcode == "cmp":
+        r1 = register_to_bin(parts[1])
+        r2 = register_to_bin(parts[2])
+
+        bin_inst = f"0010{r1}{r2}000000"
+        program.append(to_hex(bin_inst) + "\n")
+
     else:
         raise Exception(f"Unknown instruction: {opcode}")
 
@@ -159,7 +192,10 @@ print(program)
 with open("hex.txt", "w") as f:
     f.writelines(program)
 
-with open("bin.txt", "w") as f:
-    for hex_inst in program:
-        bin_inst = format(int(hex_inst.strip(), 16), "016b")
-        f.write(bin_inst + "\n")
+try: 
+    with open("bin.txt", "w") as f:
+        for hex_inst in program:
+            bin_inst = format(int(hex_inst.strip(), 16), "016b")
+            f.write(bin_inst + "\n")
+except:
+    print("No binary file found (optional)")
