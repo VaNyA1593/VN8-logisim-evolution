@@ -39,6 +39,8 @@ How to use assembler:
 
 Instruction set:
 value: 8 bit value
+address: 16 bit address
+Ram uses two registers to address 64KB of ram: rH (high byte) and rL (low byte)
 rA/rB/rC: select register(3 bit, r0 to r7, r0 is constant zero)
 con: there are 4 flags that are set after any alu operation: zero(z), carryout(c), negative(n) and not zero (nz) !! The assembler only takes the following options: z, n, c or nz
 op: logic operations: and or nor xor rsh
@@ -52,8 +54,8 @@ jmp value = value -> counter
 brh value con = if con: value -> counter
 ldi rA value = value -> rA
 adi rA value = rA + value -> rA
-lod rA rB = ram[rA] -> rB
-str rA rB = rB -> ram[rA]
+lod rH rL rA = ram[rH:rL] -> rA
+str rH rL rA = rA -> ram[rH:rL]
 cal value = counter + 1 -> stack, value -> counter
 ret = stack -> counter
 hlt = stops the clock
