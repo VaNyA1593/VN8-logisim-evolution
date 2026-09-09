@@ -32,9 +32,9 @@ How to use:
   7. If you want to run another program, clear the ROM and click the "reset" button before pasting in the new program
 
 How to use assembler:
-  1. Download main.py, hex.txt and asm.txt (bin.txt is optional and used for debug mostly)
+  1. Download main.py, hex.txt and asm.vn (bin.txt is optional and used for debug mostly)
   2. Type the assembly code into asm.txt
-  3. run the python file
+  3. Run the python file
   4. Go into hex.txt, press ctrl+A and ctrl+C, then use ctrl+V to paste it into the ROM.
 
 Instruction set:
@@ -77,3 +77,15 @@ And referenced like this:
 jmp label
 cal label
 brh label con
+
+There are a couple programs in the 'programs' folder like a 
+simple cursor program which uses the dpad, 
+a screen filler which fills the screen with colors with the square size in the input after the controller (0xf9) and only refreshes after you click the 'A' button, 
+and a pretty complicated BIOS-like program with a shell-like program inside of it which has 8 commands and uses the input after the controller (0xf9) as stdin and 0xfa as stdin2 and also the controller 'A' button
+to run the command(only when pushed and released). The commands are:
+1. Set the address location to stdin2
+2. Set the value at the address to stdin2
+3. Output the address to stdout
+4. Output the value at the address to stdout
+5. Add the value at the address to stdin2 and save it to stdout and the memory location at the address (just replaces it really)
+6-8. Same as 5 but with subtraction, logical AND and NOR.
