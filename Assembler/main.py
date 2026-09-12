@@ -154,9 +154,10 @@ for line in lines:
             cond = parts[2]
             cond_bits = {
                 "z":  "0000",
-                "n":  "0100",
-                "c":  "1000",
-                "nz": "1100"
+                "n":  "0010",
+                "c":  "0100",
+                "nz": "0110",
+                "nc": "1000"
             }[cond]
             bin_inst1 = f"011000000000{cond_bits}"
             program.append(to_hex(bin_inst1) + "\n")
