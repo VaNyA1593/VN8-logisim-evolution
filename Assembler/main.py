@@ -174,6 +174,35 @@ for line in lines:
             r3 = register_to_bin(parts[2])
             bin_inst = f"0111{r2}{r1}000{r3}"
             program.append(to_hex(bin_inst) + "\n")
+
+    elif opcode == "lil":
+        if len(parts) == 4:
+            r1 = register_to_bin(parts[1])
+            r2 = register_to_bin(parts[2])
+            r3 = register_to_bin(parts[3])
+            bin_inst = f"0111{r2}{r1}001{r3}"
+            program.append(to_hex(bin_inst) + "\n")
+        elif len(parts) == 3:
+            r2 = register_to_bin(parts[1])
+            r1 = "000"
+            r3 = register_to_bin(parts[2])
+            bin_inst = f"0111{r2}{r1}001{r3}"
+            program.append(to_hex(bin_inst) + "\n")   
+
+    elif opcode == "lih":
+        if len(parts) == 4:
+            r1 = register_to_bin(parts[1])
+            r2 = register_to_bin(parts[2])
+            r3 = register_to_bin(parts[3])
+            bin_inst = f"0111{r2}{r1}011{r3}"
+            program.append(to_hex(bin_inst) + "\n")
+        elif len(parts) == 3:
+            r2 = register_to_bin(parts[1])
+            r1 = "000"
+            r3 = register_to_bin(parts[2])
+            bin_inst = f"0111{r2}{r1}011{r3}"
+            program.append(to_hex(bin_inst) + "\n")     
+    
     # ---- STR ----
     elif opcode == "str":
         if len(parts) == 4:
