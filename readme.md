@@ -72,7 +72,9 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 
 * **`nop`**: Does nothing
 * **`add rA rB rC`**: `rA + rB -> rC`
+* **`adc rA rB rC`**: `rA + rB + Carry -> rC`
 * **`sub rA rB rC`**: `rA - rB -> rC`
+* **`sbb rA rB rC`**: `rA - rB - NOT Carry -> rC`
 * **`mul rA rB rC`**: `rA * rB -> rC`
 * **`log rA rB rC op`**: `rA op rB -> rC`
 * **`ldi rA val`**: Loads `val` into `rA`
