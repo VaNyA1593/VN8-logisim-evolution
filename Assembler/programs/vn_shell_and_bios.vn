@@ -1,0 +1,305 @@
+; Basic I/O drivers and bootloader for VN8 processor
+
+; Defines
+#define screen_x 0xf8 ; screen controls X
+#define screen_y 0xf9 ; screen controls Y
+#define screen_color 0xfa ; screen controls Color
+#define controller 0xf8 ; controller
+#define stdin 0xf9 ; standard input
+#define stdin2 0xfa ; standard input 2
+#define stdout 0xfb ; standard output
+#define clear_screen 0x80 ; screen clear value
+#define error 0x01 ; error code
+#define post_error 0x02 ; post error code
+
+; Startup code 
+
+start:
+    ; Test RAM
+    ldi r1 0xAA ; Load test address
+    ldi r2 0x55 ; Load test value
+    str r0 r1 r2 ; Store test value to test address
+
+    lod r0 r1 r3 ; Load the test value back
+    cmp r2 r3 ; Compare the stored value with the loaded value
+    brh post_error_handler nz ; If not equal, branch to post error
+
+    ; Clear the screen
+    ldi r1 clear_screen ; Load clear screen value
+    ldi r2 screen_x ; Load screen X address
+    str r0 r2 r1 ; Store clear screen value to screen X
+
+    ; Clock the screen
+    ldi r1 screen_color ; Load screen color address
+    str r0 r1 r0 ; Clock the screen
+    
+    jmp main ; Jump to main program
+
+; Core functions/drivers
+
+draw_pixel:
+    ; Draw a pixel at (r1, r2) with color r3
+    ldi r4 screen_x ; Load screen X address
+    str r0 r4 r1 ; Store X coordinate
+    ldi r4 screen_y ; Load screen Y address
+    str r0 r4 r2 ; Store Y coordinate
+    ldi r4 screen_color ; Load screen color address
+    str r0 r4 r3 ; Store color value
+    ret ; Return from subroutine
+
+stdin_read:
+    ; Read the number from stdin and store it in r1
+    ldi r2 stdin ; Load stdin address
+    lod r0 r2 r1 ; Load the value from stdin into r1
+    ret ; Return from subroutine
+
+stdin2_read:
+    ; Read the number from stdin2 and store it in r1
+    ldi r2 stdin2 ; Load stdin2 address
+    lod r0 r2 r1 ; Load the value from stdin2 into r1
+    ret ; Return from subroutine
+
+stdout_write:
+    ; Write the number in r1 to stdout
+    ldi r2 stdout ; Load stdout address
+    str r0 r2 r1 ; Store the value from r1 to stdout
+    ret ; Return from subroutine
+
+controller_read:
+    ; Read the controller state and store it in r1
+    ldi r2 controller ; Load controller address
+    lod r0 r2 r1 ; Load the value from controller into r1
+    ret ; Return from subroutine
+
+post_error_handler:
+    ; Handle post error
+    ldi r7 post_error ; Load post error code
+    hlt ; Halt the processor
+
+error_handler:
+    ; Handle error
+    ldi r7 error ; Load error code
+    ldi r6 stdout ; Load stdout address
+    str r0 r6 r7 ; Store error code to stdout
+    hlt ; Halt the processor
+
+malloc:
+    ldi r2 0x30
+loop_malloc:
+    lod r0 r2 r3
+    cmp r0 r3
+    brh found_malloc z
+    add r2 r3 r2       ; Skip ahead by the occupied block's size
+    jmp loop_malloc
+
+found_malloc:
+    mov r1 r4          ; Backup requested size to r4
+    add r2 r1 r5       ; r5 = target end address (start + size)
+    mov r2 r6          ; Backup start address of free block to r6
+
+loop2_malloc:
+    lod r0 r2 r1       ; <--- YOUR MISSING LINE (Load byte into r1)
+    cmp r1 r0          ; Is it 0x00?
+    brh full_malloc nz ; If not 0x00, space is occupied!
+    
+    adi r2 1           ; <--- FIX 1: Increment r2 to check the next byte!
+    
+    cmp r2 r5          ; Did we reach the required end address?
+    brh loop2_malloc nz 
+    
+    ; Allocation Success!
+    mov r6 r2          ; r2 = original start address
+    mov r4 r1          ; r1 = original requested size
+    str r0 r2 r1       ; Store the size header at ram[start]
+    adi r2 1           ; r2 = payload pointer (start + 1)
+    ret
+
+full_malloc:
+    mov r6 r2          ; Restore r2 to the start of the failed block
+    adi r2 1           ; <--- FIX 2: Step forward 1 byte so we don't infinite loop
+    mov r4 r1          ; Restore requested size to r1
+    jmp loop_malloc    ; Resume searching
+
+main:
+    cal app_layer ; Call the app layer
+    jmp main ; Infinite loop to keep the program running
+
+; ======================
+; App layer
+; ======================
+
+app_layer:
+    ; Command input then press 'A' to execute the command
+    ; Commands:
+    ; 01 - Store ram address from stdin2 to 0x20
+    ; 02 - Store stdin2 to ram[ram[0x20]]
+    ; 03 - Show current address in ram[0x20] to stdout
+    ; 04 - Show current value in ram[ram[0x20]] to stdout
+    ; 05 - Add ram[ram[0x20]] + stdin2 and store result in ram[ram[0x20]] and stdout
+    ; 06 - Subtract ram[ram[0x20]] - stdin2 and store result in ram[ram[0x20]] and stdout
+    ; 07 - AND ram[ram[0x20]] & stdin2 and store result in ram[ram[0x20]] and stdout
+    ; 08 - NOR ram[ram[0x20]] NOR stdin2 and store result in ram[ram[0x20]] and stdout
+
+    ; 1. Poll A button push (0x04 mask)
+wait_for_a_button:
+    ldi r1 0x04 ; Load A button mask
+    ldi r2 controller ; Load controller address
+    lod r0 r2 r3 ; Load controller state into r3
+    log r3 r1 r0 and ; Compare controller state with A button mask
+    brh wait_for_a_button z ; If not pressed, branch back to wait_for_a_button
+
+    ; 2. Poll A button release
+wait_for_a_button_release:
+    ldi r1 0x04 ; Load A button mask
+    ldi r2 controller ; Load controller address
+    lod r0 r2 r3 ; Load controller state into r3
+    log r3 r1 r0 and ; Compare controller state with A button mask
+    brh wait_for_a_button_release nz ; If still pressed, branch back
+
+    ; 3. Latch inputs ONCE into r5 and r6 right after release
+    ldi r2 stdin
+    lod r0 r2 r5 ; r5 = Command byte from stdin
+    
+    ldi r2 stdin2
+    lod r0 r2 r6 ; r6 = Data byte from stdin2
+
+cmd_1:
+    ldi r1 0x01
+    cmp r5 r1 ; Compare command in r5 with 0x01
+    brh cmd_2 nz
+
+    ; Execute: Store RAM address from stdin2 into 0x20
+    ldi r1 0x20
+    str r0 r1 r6 ; ram[0x20] = stdin2 (r6)
+    ret ; Return from app_layer
+
+cmd_2:
+    ldi r1 0x02
+    cmp r5 r1 ; Compare command in r5 with 0x02
+    brh cmd_3 nz
+
+    ; Execute: Store stdin2 into ram[ram[0x20]]
+    ldi r1 0x20
+    lod r0 r1 r4 ; r4 = Target address stored at 0x20
+    str r0 r4 r6 ; ram[r4] = stdin2 (r6)
+    ret ; Return from app_layer
+
+cmd_3:
+    ldi r1 0x03
+    cmp r5 r1 ; Compare command in r5 with 0x03
+    brh cmd_4 nz
+
+    ; Execute: Show target address (stored at 0x20) on stdout
+    ldi r1 0x20
+    lod r0 r1 r3 ; r3 = target address
+    ldi r2 stdout
+    str r0 r2 r3 ; stdout = r3
+    ret ; Return from app_layer
+
+cmd_4:
+    ldi r1 0x04
+    cmp r5 r1 ; Compare command in r5 with 0x04
+    brh cmd_5 nz
+
+    ; Execute: Show value at ram[ram[0x20]] on stdout
+    ldi r1 0x20
+    lod r0 r1 r4 ; r4 = Target address stored at 0x20
+    lod r0 r4 r3 ; r3 = Value sitting at target address
+    ldi r2 stdout
+    str r0 r2 r3 ; stdout = r3
+    ret ; Return from app_layer
+
+cmd_5: 
+    ldi r1 0x05
+    cmp r1 r5
+    brh cmd_6 nz ; Go to cmd_6 if not cmd_5
+
+    ; Execute
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    lod r0 r2 r3 ; r3 = current value in RAM
+    
+    cal stdin2_read ; r1 = stdin2 operand
+    add r1 r3 r4 ; r4 = Value + stdin2
+
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    
+    str r0 r2 r4 ; Store result into ram[r2] FIRST!
+    
+    mov r4 r1 ; Move result to r1 for stdout_write
+    cal stdout_write ; Write to stdout (this modifies r2 to 0xFB)
+
+    ret ; Return from app_layer
+
+cmd_6:
+    ldi r1 0x06
+    cmp r1 r5
+    brh cmd_7 nz ; Go to cmd_7 if not cmd_6
+
+    ; Execute
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    lod r0 r2 r3 ; r3 = current value in RAM
+    
+    cal stdin2_read ; r1 = stdin2 operand
+    sub r3 r1 r4 ; r4 = Value - stdin2
+
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    
+    str r0 r2 r4 ; Store result into ram[r2] FIRST!
+    
+    mov r4 r1 ; Move result to r1 for stdout_write
+    cal stdout_write ; Write to stdout (this modifies r2 to 0xFB)
+
+    ret ; Return from app_layer
+
+cmd_7:
+    ldi r1 0x07
+    cmp r1 r5
+    brh cmd_8 nz ; Go to cmd_8 if not cmd_7
+
+    ; Execute
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    lod r0 r2 r3 ; r3 = current value in RAM
+    
+    cal stdin2_read ; r1 = stdin2 operand
+    log r1 r3 r4 and ; r4 = Value AND stdin2
+
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    
+    str r0 r2 r4 ; Store result into ram[r2]
+    
+    mov r4 r1 ; Move result to r1 for stdout_write
+    cal stdout_write ; Write to stdout (this modifies r2 to 0xFB)
+
+    ret ; Return from app_layer
+
+cmd_8:
+    ldi r1 0x08
+    cmp r1 r5
+    brh cmd_9 nz ; Go to cmd_9 if not cmd_8
+
+    ; Execute
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    lod r0 r2 r3 ; r3 = current value in RAM
+    
+    cal stdin2_read ; r1 = stdin2 operand
+    log r1 r3 r4 nor ; r4 = Value NOR stdin2
+
+    ldi r1 0x20
+    lod r0 r1 r2 ; r2 = target RAM address (e.g., 0xAA)
+    
+    str r0 r2 r4 ; Store result into ram[r2]
+    
+    mov r4 r1 ; Move result to r1 for stdout_write
+    cal stdout_write ; Write to stdout (this modifies r2 to 0xFB)
+
+    ret ; Return from app_layer
+
+cmd_9:
+    ret ; Return from app_layer if command is unrecognized
