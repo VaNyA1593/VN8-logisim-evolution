@@ -67,12 +67,26 @@ for line in lines:
         bin_inst = f"0001{r1}{r2}000{r3}"
         program.append(to_hex(bin_inst) + "\n")
 
+    elif opcode == "adc":
+        r1 = register_to_bin(parts[1])
+        r2 = register_to_bin(parts[2])
+        r3 = register_to_bin(parts[3])
+        bin_inst = f"0001{r1}{r2}001{r3}"
+        program.append(to_hex(bin_inst) + "\n")
+
     # ---- SUB ----
     elif opcode == "sub":
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
         r3 = register_to_bin(parts[3])
         bin_inst = f"0010{r1}{r2}000{r3}"
+        program.append(to_hex(bin_inst) + "\n")
+
+    elif opcode == "sbb":
+        r1 = register_to_bin(parts[1])
+        r2 = register_to_bin(parts[2])
+        r3 = register_to_bin(parts[3])
+        bin_inst = f"0010{r1}{r2}001{r3}"
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- MUL ----
