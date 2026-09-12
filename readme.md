@@ -78,6 +78,8 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`ldi rA val`**: Loads `val` into `rA`
 * **`adi rA val`**: Adds `val` to `rA`
 * **`lod rH rL rA`**: Loads value from `RAM[rH:rL]` into `rA`
+* **`lil rH rL rA`** Loads value from I-RAM low byte at `[rH:rL]`
+* **`lih rH rL rA`** Loads value from I-RAM high byte at `[rH:rL]`
 * **`str rH rL rA`**: Stores `rA` into `RAM[rH:rL]`
 * **`sil rH rL rA`**: Stores `rA` into I-RAM low byte at `[rH:rL]`
 * **`sih rH rL rA`**: Stores `rA` into I-RAM high byte at `[rH:rL]`
