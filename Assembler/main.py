@@ -98,7 +98,7 @@ for line in lines:
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- LOG ----
-    elif opcode == "log":
+    elif opcode == "and" or "or" or "nor" or "xor" or "rsh":
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
         r3 = register_to_bin(parts[3])
@@ -108,7 +108,7 @@ for line in lines:
             'nor': '010',
             'xor': '011',
             'rsh': '100'
-        }[parts[4]]
+        }[parts[0]]
         bin_inst = f'0100{r1}{r2}{op_bits}{r3}'
         program.append(to_hex(bin_inst) + "\n")
 
@@ -311,6 +311,13 @@ for line in lines:
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
         bin_inst = f"0010{r1}{r2}000000"
+        program.append(to_hex(bin_inst) + "\n")
+
+    # ---- SHL ----
+    elif opcode == "shl":
+        r1 = register_to_bin(parts[1])
+        r2 = register_to_bin(parts[2])
+        bin_inst = f"0001{r1}{r1}000{r2}"
         program.append(to_hex(bin_inst) + "\n")
 
     else:
