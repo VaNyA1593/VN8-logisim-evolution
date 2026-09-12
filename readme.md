@@ -63,7 +63,7 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`rH rL`:** Register pair forming a 16-bit address (High Byte, Low Byte).
 * **`val`:** 8-bit number.
 * **`addr`:** 16-bit address or register pair (`rH rL`).
-* **`con`:** Flags for branching: `z` (zero), `nz` (not zero), `c` (carry), `n` (negative).
+* **`con`:** Flags for branching: `z` (zero), `nz` (not zero), `c` (carry), `nc` (not carry) `n` (negative).
 * **`op`:** Logic operator (`and`, `or`, `nor`, `xor`, `rsh`).
 
 ---
