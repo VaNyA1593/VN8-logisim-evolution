@@ -64,7 +64,6 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`val`:** 8-bit number.
 * **`addr`:** 16-bit address or register pair (`rH rL`).
 * **`con`:** Flags for branching: `z` (zero), `nz` (not zero), `c` (carry), `nc` (not carry), `n` (negative).
-* **`op`:** Logic operator (`and`, `or`, `nor`, `xor`, `rsh`).
 
 ---
 
@@ -76,7 +75,11 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`sub rA rB rC`**: `rA - rB -> rC`
 * **`sbb rA rB rC`**: `rA - rB - NOT Carry -> rC`
 * **`mul rA rB rC`**: `rA * rB -> rC`
-* **`log rA rB rC op`**: `rA op rB -> rC`
+* **`and rA rB rC op`**: `rA AND rB -> rC`
+* **`or rA rB rC op`**: `rA OR rB -> rC`
+* **`nor rA rB rC op`**: `rA NOR rB -> rC`
+* **`xor rA rB rC op`**: `rA XOR rB -> rC`
+* **`rsh rA rC op`**: `rA RSH 1 -> rC`
 * **`ldi rA val`**: Loads `val` into `rA`
 * **`adi rA val`**: Adds `val` to `rA`
 * **`lod rH rL rA`**: Loads value from `RAM[rH:rL]` into `rA`
@@ -97,6 +100,7 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 
 * **`mov rA rB`:** Copies `rA` into `rB` (turns into `add rA r0 rB`).
 * **`cmp rA rB`:** Compares `rA` and `rB` to set flags without saving the result (turns into `sub rA rB r0`).
+* **`lsh rA rB`:** Shifts `rA` left by one and stores it into `rB`. Same as multiplying `rA` by 2.
 * **Comments:** Start lines or comments with `;`.
 * **Labels:** Point to code locations (e.g., `main_loop:`). Used directly with `jmp`, `cal`, and `brh` as well as in `ldi` and `adi` to get the address.
 * **Defines:** Wrote like so: `#define name value` which defines a constant to be used in such instructions as: `ldi`, `adi`, `brh`, `jmp` and `cal`.
