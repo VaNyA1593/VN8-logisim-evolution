@@ -94,7 +94,9 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`mov rA rB`:** Copies `rA` into `rB` (turns into `add rA r0 rB`).
 * **`cmp rA rB`:** Compares `rA` and `rB` to set flags without saving the result (turns into `sub rA rB r0`).
 * **Comments:** Start lines or comments with `;`.
-* **Labels:** Point to code locations (e.g., `main_loop:`). Used directly with `jmp`, `cal`, and `brh`.
+* **Labels:** Point to code locations (e.g., `main_loop:`). Used directly with `jmp`, `cal`, and `brh` as well as in `ldi` and `adi` to get the address.
+* **Defines:** Wrote like so: `#define name value` which defines a constant to be used in such instructions as: `ldi`, `adi`, `brh`, `jmp` and `cal`.
+ 
 
 ---
 
