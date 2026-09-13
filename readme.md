@@ -143,5 +143,5 @@ The `programs/` folder includes:
 
 * **Cursor:** Use the D-pad to move a pixel on screen.
 * **Screen Fill:** Fills the screen with colors based on size inputs from `0x00f9` when pressing the `A` button.
-* **VN Kernel:** A program which is meant to have other programs in it (after the label "`app_layer:`"). Has lots of I/O accessing methods and functions in general.
+* **VN Kernel:** A program which is meant to have other programs in it (after the label `app_layer:`). Has lots of I/O accessing methods and functions in general.
 * **VN Shell:** An interactive terminal program which is supposed to use the VN Kernel, supporting 8 commands using `0x00f9` and `0x00fa` as inputs, executed by pressing and releasing `A`. Includes RAM reads/writes, pointer setups, and math operations.
