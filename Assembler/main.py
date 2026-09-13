@@ -98,7 +98,7 @@ for line in lines:
         program.append(to_hex(bin_inst) + "\n")
 
     # ---- LOG ----
-    elif opcode == "and" or "or" or "nor" or "xor":
+    elif opcode in ("and", "or", "nor", "xor"):
         r1 = register_to_bin(parts[1])
         r2 = register_to_bin(parts[2])
         r3 = register_to_bin(parts[3])
