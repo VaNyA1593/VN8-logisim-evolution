@@ -29,15 +29,17 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 
 * **`0x00f8` — Screen X / Controller Input**
 * **Write:** Sets the pixel X coordinate (0–127).
-* **Read:** Reads controller button states:
-* `Bit 0`: Y button
-* `Bit 1`: B button
-* `Bit 2`: A button
-* `Bit 3`: X button
-* `Bit 4`: D-pad Up
-* `Bit 5`: D-pad Right
-* `Bit 6`: D-pad Down
-* `Bit 7`: D-pad Left
+  * **Bit 7**: When active, sets the clear screen to 1 although the screen needs to be updated to actually clear it.
+* **Read:** Reads controller button states (pair with `and` to test for keypresses):
+  * `Bit 0`: Y button
+  * `Bit 1`: B button
+  * `Bit 2`: A button
+  * `Bit 3`: X button
+  * `Bit 4`: D-pad Up
+  * `Bit 5`: D-pad Right
+  * `Bit 6`: D-pad Down
+  * `Bit 7`: D-pad Left
+ 
 
 
 
