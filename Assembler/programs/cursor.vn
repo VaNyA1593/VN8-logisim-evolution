@@ -1,0 +1,103 @@
+#define X_address 0xf8
+#define Y_address 0xf9
+#define C_address 0xfa
+#define white 0xff
+#define ctrl_addr 0xf8
+#define dpad_up 16
+#define dpad_right 32
+#define dpad_down 64
+#define dpad_left 128
+#define clear_screen 128
+
+; Set starting center coordinates
+ldi r1 64 ; X coordinate
+ldi r2 64 ; Y coordinate 
+
+; Initial draw of the cursor
+cal update_cursor
+
+polling_loop:
+    ldi r5 ctrl_addr
+    lod r0 r5 r6 
+
+    ; --- Check DPAD UP ---
+    ldi r7 dpad_up 
+    cmp r7 r6 
+    brh check_right nz
+    adi r2 0xff          ; Y = Y - 1
+    cal update_cursor
+    jmp polling_loop     ; Frame done, wait for next tick
+
+check_right:
+    ; --- Check DPAD RIGHT ---
+    ldi r7 dpad_right
+    cmp r7 r6 
+    brh check_down nz
+    adi r1 0x01          ; X = X + 1
+    cal update_cursor
+    jmp polling_loop
+
+check_down:
+    ; --- Check DPAD DOWN ---
+    ldi r7 dpad_down 
+    cmp r7 r6 
+    brh check_left nz
+    adi r2 0x01          ; Y = Y + 1
+    cal update_cursor
+    jmp polling_loop
+
+check_left:
+    ; --- Check DPAD LEFT ---
+    ldi r7 dpad_left
+    cmp r7 r6 
+    brh polling_loop nz  ; No buttons pressed, loop back
+    adi r1 0xff          ; X = X - 1
+    cal update_cursor
+    jmp polling_loop
+
+; ==============================================================================
+; RENDER ROUTINES
+; ==============================================================================
+
+update_cursor:
+    ; 1. Clear Screen (Send reset command 128 to X_address 0xF8)
+    ldi r3 clear_screen 
+    ldi r4 X_address 
+    str r0 r4 r3
+
+    ; Clock/Reset color port
+    ldi r4 C_address 
+    str r0 r4 r0 
+
+    ; 2. Draw Center Pixel (X, Y)
+    cal draw_pixel
+
+    ; 3. Draw Right Offset (X + 1, Y)
+    adi r1 1
+    cal draw_pixel
+    
+    ; 4. Draw Left Offset (X - 1, Y) -> subtract 2 from (X + 1)
+    adi r1 0xfe
+    cal draw_pixel
+    adi r1 1             ; Restore original X
+
+    ; 5. Draw Down Offset (X, Y + 1)
+    adi r2 1
+    cal draw_pixel
+
+    ; 6. Draw Up Offset (X, Y - 1) -> subtract 2 from (Y + 1)
+    adi r2 0xfe
+    cal draw_pixel
+    adi r2 1             ; Restore original Y
+
+    ret
+
+draw_pixel:
+    ldi r5 X_address
+    str r0 r5 r1         ; Write X
+    ldi r5 Y_address
+    str r0 r5 r2         ; Write Y
+    ldi r5 C_address
+    ldi r6 white
+    str r0 r5 r6         ; Write RGB Color (Triggers pixel write)
+    ret
