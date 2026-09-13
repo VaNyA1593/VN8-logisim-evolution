@@ -14,7 +14,7 @@ The VN-8 is an 8-bit custom CPU designed in Logisim Evolution. It features dynam
 * **7 Registers (`r1`–`r7`):** General-purpose 8-bit registers.
 * **`r0` Register:** Always stays `0`. Writes to `r0` are ignored, which is useful for setting flags without changing register values (e.g., `sub r1 r2 r0`).
 * **64 KB RAM:** Main data memory. Addressed using a register pair: `rH` (high byte) and `rL` (low byte).
-* **64K Instruction RAM (I-RAM):** 16-bit wide instructions ($16 \times 65,536$). Can be updated while running using the `sil` and `sih` instructions.
+* **64K Instruction RAM (I-RAM):** 16-bit wide instructions ($16 \times 65,536$). Can be updated while running using the `sil` and `sih` instructions and read with `lil` and `lih` instructions which can let you have around 192 KB of RAM but that's dependant on the program size.
 * **16-Deep Call Stack:** Hardware stack used for subroutine calls (`cal` and `ret`).
 * **ALU Operations:** Supports `add`, `sub`, `mul`, and bitwise logic (`and`, `or`, `nor`, `xor`, right shift).
 * **Flexible Jumps:** Jumps and branches can use direct values or register pairs (`rH rL`).
@@ -83,8 +83,8 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`ldi rA val`**: Loads `val` into `rA`
 * **`adi rA val`**: Adds `val` to `rA`
 * **`lod rH rL rA`**: Loads value from `RAM[rH:rL]` into `rA`
-* **`lil rH rL rA`** Loads value from I-RAM low byte at `[rH:rL]`
-* **`lih rH rL rA`** Loads value from I-RAM high byte at `[rH:rL]`
+* **`lil rH rL rA`** Loads value from I-RAM low byte at `[rH:rL]` into `rA`
+* **`lih rH rL rA`** Loads value from I-RAM high byte at `[rH:rL]` into `rA`
 * **`str rH rL rA`**: Stores `rA` into `RAM[rH:rL]`
 * **`sil rH rL rA`**: Stores `rA` into I-RAM low byte at `[rH:rL]`
 * **`sih rH rL rA`**: Stores `rA` into I-RAM high byte at `[rH:rL]`
