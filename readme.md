@@ -16,7 +16,7 @@ The VN-8 is an 8-bit custom CPU designed in Logisim Evolution. It features dynam
 * **64 KB RAM:** Main data memory. Addressed using a register pair: `rH` (high byte) and `rL` (low byte).
 * **64K Instruction RAM (I-RAM):** 16-bit wide instructions ($16 \times 65,536$). Can be updated while running using the `sil` and `sih` instructions and read with `lil` and `lih` instructions which can let you have around 192 KB of RAM but that's dependant on the program size.
 * **16-Deep Call Stack:** Hardware stack used for subroutine calls (`cal` and `ret`).
-* **ALU Operations:** Supports `add`, `sub`, `mul`, and bitwise logic (`and`, `or`, `nor`, `xor`, right shift).
+* **ALU Operations:** Supports `add`, `sub`, `mul`, and bitwise logic (`and`, `or`, `nor`, `xor`, right shift) can also add and subtract bigger numbers with `adc` and `sbb`.
 * **Flexible Jumps:** Jumps and branches can use direct values or register pairs (`rH rL`).
 
 ---
@@ -75,7 +75,7 @@ I/O addresses range from `0x00f8` to `0x00ff`. Writing to an I/O address sends d
 * **`add rA rB rC`**: `rA + rB -> rC`
 * **`adc rA rB rC`**: `rA + rB + Carry -> rC`
 * **`sub rA rB rC`**: `rA - rB -> rC`
-* **`sbb rA rB rC`**: `rA - rB - NOT Carry -> rC`
+* **`sbb rA rB rC`**: `rA - rB + Carry -> rC`, note that in subtraction, a carry means that there is no borrow to be done.
 * **`mul rA rB rC`**: `rA * rB -> rC`
 * **`and rA rB rC op`**: `rA AND rB -> rC`
 * **`or rA rB rC op`**: `rA OR rB -> rC`
